@@ -17,72 +17,6 @@ const CATEGORY_OPTIONS = [
   "Culture",
 ];
 
-const CAMPUS_EVENT_SEED = [
-  {
-    title: "Freshmen Welcome Program",
-    body: "New students will meet campus offices, student leaders, and class advisers during this opening program.",
-    category: "Student Life",
-    location: "Main Auditorium",
-    schedule: "April 21, 2026 • 9:00 AM",
-  },
-  {
-    title: "Research Writing Seminar",
-    body: "Students will learn how to choose a topic, gather sources, and prepare a clear research paper.",
-    category: "Seminar",
-    location: "Library Conference Room",
-    schedule: "April 21, 2026 • 1:30 PM",
-  },
-  {
-    title: "Web Design Workshop",
-    body: "Students will build responsive pages for class projects and school activities in this hands-on session.",
-    category: "Workshop",
-    location: "Computer Lab 2",
-    schedule: "April 22, 2026 • 10:00 AM",
-  },
-  {
-    title: "College Intramurals Opening",
-    body: "Teams from different year levels will join the parade, oath, and opening games for this school event.",
-    category: "Sports",
-    location: "Campus Gym",
-    schedule: "April 22, 2026 • 3:00 PM",
-  },
-  {
-    title: "Culture and Arts Showcase",
-    body: "Students will present music, dance, and spoken word performances during this campus showcase.",
-    category: "Culture",
-    location: "Open Grounds Stage",
-    schedule: "April 23, 2026 • 8:30 AM",
-  },
-  {
-    title: "Student Leaders Assembly",
-    body: "Organization officers will discuss school activities, project schedules, and student concerns for the term.",
-    category: "Student Life",
-    location: "Student Center Hall",
-    schedule: "April 23, 2026 • 10:00 AM",
-  },
-  {
-    title: "Career Readiness Seminar",
-    body: "Graduating students will receive guidance on resume writing, interviews, and work preparation.",
-    category: "Seminar",
-    location: "AVR 1",
-    schedule: "April 23, 2026 • 1:00 PM",
-  },
-  {
-    title: "Campus Journalism Workshop",
-    body: "Writers and editors will practice news writing, interviewing, and headline making for school publications.",
-    category: "Workshop",
-    location: "Media Room",
-    schedule: "April 24, 2026 • 9:00 AM",
-  },
-  {
-    title: "Foundation Day Fair",
-    body: "The campus fair will feature booths, games, food stalls, and student group activities for all departments.",
-    category: "Student Life",
-    location: "University Quadrangle",
-    schedule: "April 24, 2026 • 2:00 PM",
-  },
-];
-
 const initialState = {
   apiEvents: [],
   customEvents: [],
@@ -105,9 +39,9 @@ function normalizeEvent(event) {
     id: Number(event.id),
     title: event.title,
     body: event.body,
-    category: event.category || getCategoryFromId(event.id),
-    location: event.location || "Main Campus Activity Center",
-    schedule: event.schedule || "April 22, 2026 • 1:00 PM",
+    category: event.category || getCategoryFromId(event.userId || event.id),
+    location: event.location || "Not provided by API",
+    schedule: event.schedule || "Not provided by API",
   };
 }
 
@@ -197,16 +131,7 @@ export function AppProvider({ children }) {
         }
 
         const data = await response.json();
-        const curatedEvents = data.slice(0, 9).map((event, index) =>
-          normalizeEvent({
-            ...event,
-            title: CAMPUS_EVENT_SEED[index].title,
-            body: CAMPUS_EVENT_SEED[index].body,
-            category: CAMPUS_EVENT_SEED[index].category,
-            location: CAMPUS_EVENT_SEED[index].location,
-            schedule: CAMPUS_EVENT_SEED[index].schedule,
-          }),
-        );
+        const curatedEvents = data.slice(0, 9).map((event) => normalizeEvent(event));
 
         dispatch({
           type: "SET_EVENTS",
@@ -263,11 +188,11 @@ export function AppProvider({ children }) {
 
   function authenticate(email, password) {
     dispatch({ type: "LOGIN_START" });
-    
+
     // Simulate API delay
     setTimeout(() => {
       const user = MOCK_USERS.find(
-        (u) => u.email === email.toLowerCase() && u.password === password
+        (u) => u.email === email.toLowerCase() && u.password === password,
       );
 
       if (user) {
